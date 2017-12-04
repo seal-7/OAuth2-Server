@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Beer Locker</title>
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container" style="border:thin solid #000000;margin-top:10%;padding:10px">
+    <p>Hi<b> <%= user.username %>!</b></p>
+    <p><b><%= client.name %></b> is requesting <b>full access</b> to your account.</p>
+    <p>Do you approve?</p>
+
+    <form class="form-horizontal" action="/api/oauth2/authorize" method="post">
+      <input name="transaction_id" class="form-control" type="hidden" value="<%= transactionID %>">
+      <div>
+      <input type="submit"  value="Allow" id="allow">
+      <input type="submit"  value="Deny" name="cancel" id="deny">
+      </div>
+    </form>
+    <div>
+  </body>
+</html>
