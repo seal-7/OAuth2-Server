@@ -39,6 +39,7 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, ca
 
 // Exchange authorization codes for access tokens
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, callback) {
+
   Code.findOne({ value: code }, function (err, authCode) {
     if (err) { return callback(err); }
     if (authCode === undefined) { return callback(null, false); }
@@ -56,12 +57,22 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, ca
         userId: authCode.userId
       });
 
-      // Save the access token and check for errors
-      token.save(function (err) {
-        if (err) { return callback(err); }
-
-        callback(null, token);
-      });
+      //Find if access token already issued
+      Token.findOne({"userId":authCode.userId},function(err,dbToken){
+        if(err || dbToken==null){
+          // Save the access token and check for errors
+          token.save(function (err) {
+            if (err) {
+              return callback(err);
+            }
+            callback(null, token);
+          });
+        }
+        else{
+          console.log("Sending already issued token");
+          callback(null,dbToken);
+        }
+      })
     });
   });
 }));
@@ -69,8 +80,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, ca
 
 // User authorization endpoint
 exports.authorization = [
-  server.authorization(function(clientId, redirectUri, callback) {
-    console.log(clientId);
+  server.authorization(function(clientId, redirectUri, callback) {    
     Client.findOne({ id: clientId }, function (err, client) {
       if (err) {return callback(err); }
       console.log(client);
@@ -78,7 +88,18 @@ exports.authorization = [
     });
   }),
   function(req, res){
-    res.render('dialog', { transactionID: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
+    Token.findOne({"userId":req.user._id},function(err,user){
+      if(err){
+        throw err;
+      }
+      if(user==null){
+          res.render('dialog', { transactionID: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
+      }
+      else{
+          res.render('dialogSignin', { transactionID: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
+      }
+    })
+
   }
 ]
 

@@ -27,13 +27,14 @@ router.delete('/data/:beer_id',authController.isAuthenticated,beerController.rem
 // Create endpoint handlers for /users
 router.route('/users')
   .post(userController.postUsers)
-  .get(authController.isAuthenticated,userController.getUsers);
+  .get(authController.isAuthenticated,userController.getUserById);
+
 
 router.route('/users/signup')
   .get(userController.signup);
 
 // Create endpoint handlers for /clients
-router.route('/clients')
+router.route('/clients/signup')
   .post(authController.isAuthenticated, clientController.postClients)
   .get(authController.isAuthenticated, clientController.getClients);
 
@@ -47,9 +48,5 @@ router.route('/clients')
   router.route('/oauth2/token')
     .post(authController.isClientAuthenticated, oauth2Controller.token);
 
-  router.get('/logout',function(req,res){
-    req.logout();
-    res.redirect('/');
-  })
 
 module.exports = router;

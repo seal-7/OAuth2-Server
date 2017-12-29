@@ -17,7 +17,6 @@ exports.postUsers = function(req, res) {
   user.save(function(err) {
     if (err)
       res.send(err);
-
     res.json({ message: 'New User Add Succesful!' });
   });
 };
@@ -31,6 +30,31 @@ exports.getUsers = function(req, res) {
     res.json(users);
   });
 };
+
+// Create endpoint /api/users for GET
+exports.getUserById = function(req, res) {
+  console.log(req.query.id);
+  User.findOne({_id:req.query.id},function(err,user){
+    if(err){
+      res.send({error:"Internal error"});
+    }
+    else if(user==null){
+      res.send({error:"Invalid userId"});
+    }
+    else{
+      console.log(user);
+      var userDetails={
+        _id:user._id,
+        username:user.username,
+        name:user.name,
+        email:user.email
+      }
+      res.send(userDetails);
+    }
+  })
+};
+
+
 // Create endpoint /api/users for GET
 exports.signup = function(req, res) {
   res.render('userSignup');

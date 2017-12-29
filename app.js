@@ -17,7 +17,6 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var api = require('./routes/api');
 
-
 var app = express();
 
 // view engine setup
@@ -31,20 +30,29 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-// Use express session support since OAuth2orize requires it
-app.use(session({
-  secret: 'Super Secret Session Key',
-  saveUninitialized: true,
-  resave: true
-}));
 
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
 
 app.use('/', index);
 app.use('/users', users);
 app.use('/api',api);
 
-//Use the passport package in our application
-app.use(passport.initialize());
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
